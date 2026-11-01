@@ -1,0 +1,30 @@
+{
+  "name": "fileit",
+  "version": "1.0.0",
+  "description": "Decentralized, cross-device file sharing, interactive PDF studio, WebRTC data beam, and 3-day self-dissolving rooms.",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "artifacts/*",
+    "lib/*"
+  ],
+  "scripts": {
+    "dev": "bash ./dev.sh",
+    "dev:server": "npm run dev --workspace=@workspace/api-server",
+    "dev:client": "npm run dev --workspace=@workspace/fileit",
+    "build": "npm run build --workspaces --if-present && mkdir -p dist/server && (cp -rf artifacts/fileit/dist/public/* dist/ 2>/dev/null || true) && (cp -rf artifacts/api-server/dist/* dist/server/ 2>/dev/null || true)",
+    "start": "node server.ts",
+    "lint": "tsc --noEmit --skipLibCheck"
+  },
+  "dependencies": {
+    "@types/pg": "^8.23.1",
+    "dotenv": "^18.0.1",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.5",
+    "typescript": "~5.9.3"
+  }
+}

@@ -1,0 +1,77 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Metallic Shield Gradient -->
+    <linearGradient id="shield-grad" x1="40" y1="30" x2="216" y2="226" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#FFFFFF" />
+      <stop offset="35%" stopColor="#E2E8F0" />
+      <stop offset="70%" stopColor="#94A3B8" />
+      <stop offset="100%" stopColor="#64748B" />
+    </linearGradient>
+
+    <!-- Chrome Stroke Highlight -->
+    <linearGradient id="silver-stroke" x1="60" y1="30" x2="196" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.9" />
+      <stop offset="50%" stopColor="#CBD5E1" stopOpacity="0.6" />
+      <stop offset="100%" stopColor="#475569" stopOpacity="0.8" />
+    </linearGradient>
+
+    <!-- Arrow Gradient -->
+    <linearGradient id="arrow-grad" x1="40" y1="210" x2="210" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#CBD5E1" />
+      <stop offset="40%" stopColor="#FFFFFF" />
+      <stop offset="100%" stopColor="#F8FAFC" />
+    </linearGradient>
+
+    <!-- Subtle Drop Shadow -->
+    <filter id="shield-shadow" x="20" y="20" width="216" height="216" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0F172A" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <g filter="url(#shield-shadow)">
+    <!-- Outer Shield Contour -->
+    <path
+      d="M128 36 C155 46 182 43 194 48 C197 50 198 53 198 57 V126 C198 172 165 208 128 222 C91 208 58 172 58 126 V57 C58 53 59 50 62 48 C74 43 101 46 128 36 Z"
+      fill="none"
+      stroke="url(#shield-grad)"
+      stroke-width="12"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+    />
+
+    <!-- Inner Shield Ribs / Crest -->
+    <path
+      d="M128 64 C148 72 168 70 174 74 V124 C174 158 150 186 128 198 C106 186 82 158 82 124 V74 C88 70 108 72 128 64 Z"
+      fill="none"
+      stroke="url(#silver-stroke)"
+      stroke-width="6"
+      stroke-linejoin="round"
+      opacity="0.8"
+    />
+
+    <!-- Diagonal Dynamic Sword / Speed Arrow cutting across -->
+    <!-- Arrow Shaft -->
+    <path
+      d="M48 208 L170 86"
+      stroke="url(#arrow-grad)"
+      stroke-width="16"
+      stroke-linecap="round"
+    />
+    
+    <!-- Sharp Arrow Head at top right -->
+    <path
+      d="M140 82 H186 V128 L170 86 Z"
+      fill="url(#arrow-grad)"
+      stroke="url(#arrow-grad)"
+      stroke-width="4"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+    />
+
+    <!-- Tail Accent Notch -->
+    <path
+      d="M48 208 L40 216 L44 196 Z"
+      fill="url(#arrow-grad)"
+    />
+  </g>
+</svg>

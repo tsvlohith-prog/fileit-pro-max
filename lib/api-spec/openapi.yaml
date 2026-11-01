@@ -1,0 +1,521 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Fileit - file sharing API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: files
+    description: File operations
+  - name: folders
+    description: Folder operations
+  - name: text-messages
+    description: Plain-text and code message operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /files:
+    get:
+      operationId: listFiles
+      tags: [files]
+      summary: List all uploaded files
+      parameters:
+        - name: folderId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FileRecord"
+
+    post:
+      operationId: createFile
+      tags: [files]
+      summary: Register an uploaded file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FileInput"
+      responses:
+        "201":
+          description: File record created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileRecord"
+        "400":
+          description: Bad request
+
+  /files/stats:
+    get:
+      operationId: getFileStats
+      tags: [files]
+      summary: Get aggregate stats about uploaded files
+      responses:
+        "200":
+          description: File statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileStats"
+
+  /files/share/{token}:
+    get:
+      operationId: getFileByToken
+      tags: [files]
+      summary: Get file by share token
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileRecord"
+        "404":
+          description: File not found
+
+  /files/{id}:
+    get:
+      operationId: getFile
+      tags: [files]
+      summary: Get file metadata by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileRecord"
+        "404":
+          description: File not found
+
+    delete:
+      operationId: deleteFile
+      tags: [files]
+      summary: Delete a file record and its stored data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: File deleted
+        "404":
+          description: File not found
+
+  /files/{id}/move:
+    put:
+      operationId: moveFile
+      tags: [files]
+      summary: Move a file to a folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FileMoveInput"
+      responses:
+        "200":
+          description: File moved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileRecord"
+        "404":
+          description: File not found
+
+  /folders:
+    get:
+      operationId: listFolders
+      tags: [folders]
+      summary: List all folders
+      responses:
+        "200":
+          description: List of folders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FolderRecord"
+
+    post:
+      operationId: createFolder
+      tags: [folders]
+      summary: Create a folder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderInput"
+      responses:
+        "201":
+          description: Folder created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FolderRecord"
+
+  /folders/{id}:
+    delete:
+      operationId: deleteFolder
+      tags: [folders]
+      summary: Delete a folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Folder deleted
+        "404":
+          description: Folder not found
+
+  /folders/{id}/files:
+    get:
+      operationId: listFolderFiles
+      tags: [folders]
+      summary: List files in a folder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Files in folder
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FileRecord"
+
+  /folders/share/{token}:
+    get:
+      operationId: getFolderByShareToken
+      tags: [folders]
+      summary: Get a shared folder and its contents
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shared folder contents
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FolderShareResponse"
+        "404":
+          description: Folder not found
+
+  /folders/share/{token}/download:
+    get:
+      operationId: downloadSharedFolder
+      tags: [folders]
+      summary: Download all files in a shared folder as a ZIP
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ZIP archive of the folder contents
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Folder not found
+
+  /text-messages:
+    get:
+      operationId: listTextMessages
+      tags: [text-messages]
+      summary: List all text messages
+      parameters:
+        - name: fileId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: folderId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of text messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TextMessageRecord"
+
+    post:
+      operationId: createTextMessage
+      tags: [text-messages]
+      summary: Create a text message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TextMessageInput"
+      responses:
+        "201":
+          description: Text message created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextMessageRecord"
+        "400":
+          description: Bad request
+
+  /text-messages/{id}:
+    delete:
+      operationId: deleteTextMessage
+      tags: [text-messages]
+      summary: Delete a text message
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Text message deleted
+        "404":
+          description: Text message not found
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    FileRecord:
+      type: object
+      required:
+        - id
+        - originalName
+        - size
+        - mimeType
+        - shareToken
+        - storagePath
+        - createdAt
+      properties:
+        id:
+          type: string
+        originalName:
+          type: string
+        size:
+          type: integer
+        mimeType:
+          type: string
+        shareToken:
+          type: string
+        storagePath:
+          type: string
+        folderId:
+          type: ["string", "null"]
+        downloadCount:
+          type: integer
+        createdAt:
+          type: string
+
+    FileInput:
+      type: object
+      required:
+        - originalName
+        - size
+        - mimeType
+        - storagePath
+        - shareToken
+      properties:
+        originalName:
+          type: string
+        size:
+          type: integer
+        mimeType:
+          type: string
+        storagePath:
+          type: string
+        shareToken:
+          type: string
+        folderId:
+          type: ["string", "null"]
+
+    FileStats:
+      type: object
+      required:
+        - totalFiles
+        - totalSize
+        - recentUploads
+      properties:
+        totalFiles:
+          type: integer
+        totalSize:
+          type: integer
+        recentUploads:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileRecord"
+
+    FolderRecord:
+      type: object
+      required:
+        - id
+        - name
+        - createdAt
+        - fileCount
+        - shareToken
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+        fileCount:
+          type: integer
+          description: Number of files currently in this folder
+        shareToken:
+          type: string
+
+    FolderInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    FileMoveInput:
+      type: object
+      required:
+        - folderId
+      properties:
+        folderId:
+          type: ["string", "null"]
+
+    TextMessageRecord:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - language
+        - createdAt
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        language:
+          type: string
+        fileId:
+          type: ["string", "null"]
+        folderId:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    TextMessageInput:
+      type: object
+      required:
+        - content
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        language:
+          type: string
+        fileId:
+          type: ["string", "null"]
+        folderId:
+          type: ["string", "null"]
+
+    FolderShareResponse:
+      type: object
+      required:
+        - folder
+        - files
+        - textMessages
+      properties:
+        folder:
+          $ref: "#/components/schemas/FolderRecord"
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileRecord"
+        textMessages:
+          type: array
+          items:
+            $ref: "#/components/schemas/TextMessageRecord"
